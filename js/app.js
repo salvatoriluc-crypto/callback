@@ -165,8 +165,7 @@ app.addEventListener('submit', async (e) => {
     if (kind === 'signup') {
       const fd = new FormData(form);
       const v = (k) => (fd.get(k) || '').toString().trim();
-      state.invite = v('invite');
-      const res = await store.signUp({ email: v('email'), password: fd.get('password').toString(), invite: v('invite'), name: v('name') });
+      const res = await store.signUp({ email: v('email'), password: fd.get('password').toString(), name: v('name') });
       state.loginError = '';
       if (res.needsConfirm) { state.signupDone = true; render(); return; }
       state.session = res.session; state.invite = '';

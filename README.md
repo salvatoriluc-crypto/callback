@@ -26,8 +26,7 @@ Así ya puedes enseñarla: arranca en modo demo, se entra con cualquier email y 
 1. Crea una cuenta en [supabase.com](https://supabase.com) y un proyecto nuevo (región *Frankfurt* o *Paris*).
 2. Abre **SQL Editor › New query**, pega el contenido de `supabase/schema.sql` y pulsa **Run**.
    Crea las tablas y las reglas para que cada persona solo vea sus propios castings.
-3. **Authentication › Sign In / Providers › Email**: deja Email activado y **desactiva "Allow new users to sign up"**
-   (así solo entra quien tú invites).
+3. **Authentication › Sign In / Providers › Email**: deja Email activado (ver 2b para el registro).
 4. **Authentication › URL Configuration**: en *Site URL* pon `https://TU-USUARIO.github.io/callback/`.
 5. Para cada tester: **Authentication › Users › Add user › Create new user**, con su email y una contraseña
    (marca *Auto Confirm User*). Pásale el enlace de la web y su contraseña; puede cambiarla con "¿Olvidaste tu contraseña?".
@@ -38,15 +37,12 @@ Así ya puedes enseñarla: arranca en modo demo, se entra con cualquier email y 
 > La clave *anon* es pública por diseño; lo que protege los datos son las reglas de `schema.sql`.
 > **Nunca** pegues en la web la clave *service_role* ni la de Claude.
 
-## 2b. Invitar a tus colegas (registro con código)
+## 2b. Registro abierto
 
-1. **SQL Editor › New query**: pega `supabase/invitaciones.sql` y pulsa **Run**. Crea el código `CALLBACK2026` (50 cuentas).
-2. **Authentication › Sign In / Providers**: activa **Allow new users to sign up** y, dentro de **Email**,
-   desactiva **Confirm email** (el correo de confirmación que trae Supabase de serie solo llega a los miembros de tu equipo).
-3. Envía este enlace: `https://TU-USUARIO.github.io/callback-app/?invitacion=CALLBACK2026`
-
-Nadie puede crear cuenta sin un código válido. Para más códigos, cerrar uno o ver cuántos se han usado:
-**Table Editor › invite_codes** (columnas `max_uses`, `uses`, `active`).
+Cualquiera con el enlace puede crear su cuenta con email y contraseña desde "Crea tu cuenta".
+En **Authentication › Sign In / Providers** deja activado **Allow new users to sign up**.
+Si **Confirm email** está activado, hace falta un SMTP propio (Authentication › Emails › SMTP Settings);
+si no, desactívalo y los usuarios entran nada más registrarse.
 
 ## 3. Lectura automática con Claude (pago por uso, céntimos por convocatoria)
 
