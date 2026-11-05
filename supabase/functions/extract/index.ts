@@ -82,10 +82,10 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
   try {
-    const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, {
-      global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } }
-    });
-    const { data: { user } } = await sb.auth.getUser();
+    // Comprobamos el token de la sesión con la clave de servicio (funciona con claves nuevas y antiguas).
+    const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const token = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '');
+    const { data: { user } } = token ? await admin.auth.getUser(token) : { data: { user: null } };
     if (!user) return json({ error: 'Inicia sesión' }, 401);
     const body = await req.json();
     if (!body.text && !body.pdfBase64) return json({ error: 'Envía texto o un PDF' }, 400);
