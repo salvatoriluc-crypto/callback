@@ -31,11 +31,12 @@ export function loginView({ error = '', recovery = false } = {}) {
       <label class="field">Contraseña<input class="input" type="password" name="password" autocomplete="current-password" required></label>
       ${error ? `<p class="error" role="alert">${esc(error)}</p>` : ''}
       <button class="btn btn-primary btn-block" type="submit" style="min-height:52px;font-size:16px">Entrar</button>
+      <a class="btn btn-ghost btn-block" href="#/registro" style="min-height:52px;font-size:16px">Crear cuenta</a>
       <button class="link" type="button" data-act="forgot" style="align-self:center">¿Olvidaste tu contraseña?</button>
     </div>
     <div class="card row" style="align-items:flex-start;gap:10px">
       <span class="chip" style="background:var(--lime);color:var(--ink)">BETA</span>
-      <span class="small" style="color:var(--neutral-ink)">${isDemo ? 'Modo demo: entra con cualquier email y contraseña para ver la app con datos de ejemplo.' : '¿Aún no tienes cuenta? <a href="#/registro">Crea tu cuenta</a> con tu email y una contraseña.'}</span>
+      <span class="small" style="color:var(--neutral-ink)">${isDemo ? 'Modo demo: entra con cualquier email y contraseña para ver la app con datos de ejemplo.' : 'Beta abierta: crea tu cuenta gratis con tu email y una contraseña.'}</span>
     </div>
   </form></div>`;
 }
