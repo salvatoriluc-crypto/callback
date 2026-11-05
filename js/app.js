@@ -2,13 +2,15 @@
 import * as store from './store.js';
 import { toast, download } from './ui.js';
 import { icsFor } from './logic.js';
-import { loginView, homeView, listView, castingView, panelView, profileView, addView, editView } from './views.js';
+import { signupView, loginView, homeView, listView, castingView, panelView, profileView, addView, editView } from './views.js';
 
 const app = document.getElementById('app');
 const state = {
   session: null, castings: [], profile: null, recovery: false, loginError: '',
   ui: { filter: 'todas', query: '', onlyFit: {}, pasteText: '', busy: false, error: '' },
-  draft: null
+  draft: null,
+  invite: new URLSearchParams(location.search).get('invitacion') || '',
+  signupDone: false
 };
 
 const route = () => (location.hash.replace(/^#/, '') || '/').split('/').filter(Boolean);
@@ -18,7 +20,11 @@ const byId = (id) => state.castings.find((c) => String(c.id) === String(id));
 function render() {
   const [page, id] = route();
   if (state.recovery) { app.innerHTML = loginView({ recovery: true, error: state.loginError }); return; }
-  if (!state.session) { app.innerHTML = loginView({ error: state.loginError }); return; }
+  if (!state.session) {
+    if (page === 'registro' || (state.invite && page !== 'entrar')) app.innerHTML = signupView({ error: state.loginError, invite: state.invite, done: state.signupDone });
+    else app.innerHTML = loginView({ error: state.loginError });
+    return;
+  }
   const ctx = { castings: state.castings, profile: state.profile, session: state.session, ui: state.ui };
   let html;
   switch (page) {
@@ -156,6 +162,19 @@ app.addEventListener('submit', async (e) => {
   e.preventDefault();
   const kind = form.dataset.form;
   try {
+    if (kind === 'signup') {
+      const fd = new FormData(form);
+      const v = (k) => (fd.get(k) || '').toString().trim();
+      state.invite = v('invite');
+      const res = await store.signUp({ email: v('email'), password: fd.get('password').toString(), invite: v('invite'), name: v('name') });
+      state.loginError = '';
+      if (res.needsConfirm) { state.signupDone = true; render(); return; }
+      state.session = res.session; state.invite = '';
+      history.replaceState(null, '', location.pathname + '#/perfil');
+      await refresh(); render();
+      toast('Cuenta creada. Completa tu perfil para filtrar roles.');
+      return;
+    }
     if (kind === 'login') {
       const fd = new FormData(form);
       state.session = await store.login(fd.get('email').toString().trim(), fd.get('password').toString());
@@ -184,7 +203,7 @@ app.addEventListener('submit', async (e) => {
     }
   } catch (err) {
     state.ui.busy = false;
-    if (kind === 'login' || kind === 'newpass') { state.loginError = err.message; render(); }
+    if (kind === 'login' || kind === 'newpass' || kind === 'signup') { state.loginError = err.message; render(); }
     else if (kind === 'paste') { state.ui.error = err.message; render(); }
     else toast(err.message);
   }

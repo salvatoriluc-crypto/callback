@@ -35,7 +35,32 @@ export function loginView({ error = '', recovery = false } = {}) {
     </div>
     <div class="card row" style="align-items:flex-start;gap:10px">
       <span class="chip" style="background:var(--lime);color:var(--ink)">BETA</span>
-      <span class="small" style="color:var(--neutral-ink)">${isDemo ? 'Modo demo: entra con cualquier email y contraseña para ver la app con datos de ejemplo.' : 'Acceso solo por invitación. Si quieres probarla, pide una cuenta a quien te la recomendó.'}</span>
+      <span class="small" style="color:var(--neutral-ink)">${isDemo ? 'Modo demo: entra con cualquier email y contraseña para ver la app con datos de ejemplo.' : 'Acceso solo por invitación. ¿Te han invitado? <a href="#/registro">Crea tu cuenta</a>.'}</span>
+    </div>
+  </form></div>`;
+}
+
+export function signupView({ error = '', invite = '', done = false } = {}) {
+  if (done) {
+    return `<div class="login"><div class="login-card">
+      <div class="stack">${logoViolet(56, 'Logo de Callback')}<h1>Revisa tu email</h1>
+      <p class="muted" style="margin:0">Te hemos enviado un enlace para confirmar tu cuenta. Ábrelo y luego entra con tu email y contraseña.</p></div>
+      <a class="btn btn-primary btn-block" href="#/entrar">Ir a entrar</a></div></div>`;
+  }
+  return `<div class="login"><form class="login-card" data-form="signup" novalidate>
+    <div class="stack">
+      ${logoViolet(56, 'Logo de Callback')}
+      <h1>Crea tu cuenta</h1>
+      <p class="muted" style="margin:0;font-size:15px">Te han invitado a la beta de callback. En un minuto tendrás todos tus castings ordenados.</p>
+    </div>
+    <div class="stack">
+      <label class="field">Nombre<input class="input" name="name" autocomplete="name" required></label>
+      <label class="field">Email<input class="input" type="email" name="email" autocomplete="email" required></label>
+      <label class="field">Contraseña (mínimo 6 caracteres)<input class="input" type="password" name="password" autocomplete="new-password" minlength="6" required></label>
+      <label class="field">Código de invitación<input class="input" name="invite" value="${esc(invite)}" autocapitalize="characters" required style="text-transform:uppercase;letter-spacing:1px"></label>
+      ${error ? `<p class="error" role="alert">${esc(error)}</p>` : ''}
+      <button class="btn btn-primary btn-block" type="submit" style="min-height:52px;font-size:16px">Crear cuenta</button>
+      <a class="link" href="#/entrar" style="align-self:center">Ya tengo cuenta · Entrar</a>
     </div>
   </form></div>`;
 }

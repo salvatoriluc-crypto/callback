@@ -40,6 +40,34 @@ export async function login(email, password) {
   if (error) throw new Error(error.message === 'Invalid login credentials' ? 'Email o contraseña incorrectos.' : error.message);
   return { email: data.user.email, id: data.user.id };
 }
+export async function signUp({ email, password, invite, name }) {
+  if (!email || !password) throw new Error('Escribe tu email y una contraseña.');
+  if (password.length < 6) throw new Error('La contraseña debe tener al menos 6 caracteres.');
+  if (!invite) throw new Error('Falta el código de invitación.');
+  if (isDemo) {
+    const s = { email, id: 'demo' };
+    dset('cb_session', s);
+    if (!dget('cb_castings', null)) dset('cb_castings', demoCastings());
+    return { session: s, needsConfirm: false };
+  }
+  const { data, error } = await sb.auth.signUp({
+    email, password,
+    options: { data: { invite: invite.trim().toUpperCase(), name }, emailRedirectTo: location.origin + location.pathname }
+  });
+  if (error) {
+    const m = error.message || '';
+    if (/database error|invitaci/i.test(m)) throw new Error('El código de invitación no es válido o ya se ha agotado.');
+    if (/registered|already/i.test(m)) throw new Error('Ya existe una cuenta con ese email. Entra con tu contraseña.');
+    if (/signups not allowed|disabled/i.test(m)) throw new Error('El registro está cerrado ahora mismo. Avisa a quien te invitó.');
+    throw new Error(m);
+  }
+  if (data.session) {
+    try { await sb.from('profiles').upsert({ user_id: data.user.id, data: { name, types: { OCP: true, SEC: true, FE: true, MANOS: false }, skills: [], gender: 'H', travel: true, eatsAll: true } }); } catch { /* el perfil se puede completar luego */ }
+    return { session: { email: data.user.email, id: data.user.id }, needsConfirm: false };
+  }
+  return { session: null, needsConfirm: true };
+}
+
 export async function logout() {
   if (isDemo) { LS.del('cb_session'); delete mem.cb_session; return; }
   await sb.auth.signOut();

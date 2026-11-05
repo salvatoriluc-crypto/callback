@@ -38,6 +38,16 @@ Así ya puedes enseñarla: arranca en modo demo, se entra con cualquier email y 
 > La clave *anon* es pública por diseño; lo que protege los datos son las reglas de `schema.sql`.
 > **Nunca** pegues en la web la clave *service_role* ni la de Claude.
 
+## 2b. Invitar a tus colegas (registro con código)
+
+1. **SQL Editor › New query**: pega `supabase/invitaciones.sql` y pulsa **Run**. Crea el código `CALLBACK2026` (50 cuentas).
+2. **Authentication › Sign In / Providers**: activa **Allow new users to sign up** y, dentro de **Email**,
+   desactiva **Confirm email** (el correo de confirmación que trae Supabase de serie solo llega a los miembros de tu equipo).
+3. Envía este enlace: `https://TU-USUARIO.github.io/callback-app/?invitacion=CALLBACK2026`
+
+Nadie puede crear cuenta sin un código válido. Para más códigos, cerrar uno o ver cuántos se han usado:
+**Table Editor › invite_codes** (columnas `max_uses`, `uses`, `active`).
+
 ## 3. Lectura automática con Claude (pago por uso, céntimos por convocatoria)
 
 1. Crea una clave en [console.anthropic.com](https://console.anthropic.com) › API Keys (añade algo de saldo).
